@@ -59,12 +59,23 @@ public:
     // not running.
     Option<pid_t> pid;
 
+    std::string ip_address;
+    std::string gateway;
+    std::string bridge;
+    int ip_prefix_len;
+    std::string mac_address;
+
   private:
     Container(
         const std::string& _id,
         const std::string& _name,
-        const Option<pid_t>& _pid)
-      : id(_id), name(_name), pid(_pid) {}
+        const Option<pid_t>& _pid,
+        const std::string& _ip_address,
+        const std::string& _gateway,
+        const std::string& _bridge,
+        const int _ip_prefix_len,
+        const std::string& _mac_address)
+      : id(_id), name(_name), pid(_pid), ip_address(_ip_address), gateway(_gateway), bridge(_bridge), ip_prefix_len(_ip_prefix_len), mac_address(_mac_address) {}
   };
 
   class Image

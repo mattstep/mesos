@@ -598,7 +598,6 @@ message TaskInfo {
   optional HealthCheck health_check = 8;
 }
 
-
 /**
  * Describes possible task states. IMPORTANT: Mesos assumes tasks that
  * enter terminal states (see below) imply the task is no longer
@@ -666,8 +665,19 @@ message TaskStatus {
   // (true) or unhealthy (false) according to the HealthCheck field in
   // the command info.
   optional bool healthy = 8;
+  optional ContainerNetworkSettings container_network_settings = 11;
 }
 
+/**
+ * Container network information from docker.
+ */
+message ContainerNetworkSettings {
+  optional string bridge = 1;
+  optional string gateway = 2;
+  optional string ip_address = 3;
+  optional uint32 ip_prefix_len = 4;
+  optional string mac_address = 5;
+}
 
 /**
  * Describes possible filters that can be applied to unused resources

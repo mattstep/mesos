@@ -230,7 +230,67 @@ Try<Docker::Container> Docker::Container::create(const JSON::Object& json)
     optionalPid = pid;
   }
 
-  return Docker::Container(id, name, optionalPid);
+  entry = json.values.find("NetworkSettings");
+  if (entry == json.values.end()) {
+    return Error("Unable to find NetworkSettings in container");
+  }
+
+  JSON::Value networkSettingsValue = entry->second;
+  if (!networkSettingsValue.is<JSON::Object>()) {
+    return Error("NetworkSettings in container is not object type");
+  }
+
+  entry = networkSettingsValue.as<JSON::Object>().values.find("IPAddress");
+  if (entry == json.values.end()) {
+    return Error("Unable to find IPAddress in NetworkSettings");
+  }
+
+  JSON::Value ipAddress = entry->second;
+  if (!ipAddress.is<JSON::String>()) {
+    return Error("IPAddress in NetworkSettings is not string type");
+  }
+
+  entry = networkSettingsValue.as<JSON::Object>().values.find("Gateway");
+  if (entry == json.values.end()) {
+    return Error("Unable to find Gateway in NetworkSettings");
+  }
+
+  JSON::Value gateway = entry->second;
+  if (!gateway.is<JSON::String>()) {
+    return Error("Gateway in NetworkSettings is not string type");
+  }
+
+  entry = networkSettingsValue.as<JSON::Object>().values.find("Bridge");
+  if (entry == json.values.end()) {
+    return Error("Unable to find Bridge in NetworkSettings");
+  }
+
+  JSON::Value bridge = entry->second;
+  if (!bridge.is<JSON::String>()) {
+    return Error("Bridge in NetworkSettings is not string type");
+  }
+
+  entry = networkSettingsValue.as<JSON::Object>().values.find("IPPrefixLen");
+  if (entry == json.values.end()) {
+    return Error("Unable to find IPPrefixLen in NetworkSettings");
+  }
+
+  JSON::Value ipPrefixLen = entry->second;
+  if (!ipPrefixLen.is<JSON::Number>()) {
+    return Error("IPPrefixLen in NetworkSettings is not number type");
+  }
+
+  entry = networkSettingsValue.as<JSON::Object>().values.find("MacAddress");
+  if (entry == json.values.end()) {
+    return Error("Unable to find MacAddress in NetworkSettings");
+  }
+
+  JSON::Value macAddress = entry->second;
+  if (!macAddress.is<JSON::String>()) {
+    return Error("MacAddress in NetworkSettings is not string type");
+  }
+
+  return Docker::Container(id, name, optionalPid, ipAddress.as<JSON::String>().value, gateway.as<JSON::String>().value, bridge.as<JSON::String>().value, ipPrefixLen.as<JSON::Number>().value, macAddress.as<JSON::String>().value);
 }
 
 

@@ -394,6 +394,12 @@ private:
     // Once the container is running, this saves the pid of the
     // running container.
     Option<pid_t> pid;
+
+    std::string ip_address;
+    std::string gateway;
+    std::string bridge;
+    int ip_prefix_len;
+    std::string mac_address;
   };
 
   hashmap<ContainerID, Container*> containers_;
@@ -1197,22 +1203,22 @@ Future<Nothing> DockerContainerizerProcess::update(
   // Store the resources for usage().
   container->resources = _resources;
 
-#ifdef __linux__
+//#ifdef __linux__
   if (!_resources.cpus().isSome() && !_resources.mem().isSome()) {
     LOG(WARNING) << "Ignoring update as no supported resources are present";
     return Nothing();
   }
 
   // Skip inspecting the docker container if we already have the pid.
-  if (container->pid.isSome()) {
-    return __update(containerId, _resources, container->pid.get());
-  }
+//  if (container->pid.isSome()) {
+//    return __update(containerId, _resources, container->pid.get());
+//  }
 
   return docker->inspect(containers_[containerId]->name())
     .then(defer(self(), &Self::_update, containerId, _resources, lambda::_1));
-#else
-  return Nothing();
-#endif // __linux__
+//#else
+//  return Nothing();
+//#endif // __linux__
 }
 
 
@@ -1232,6 +1238,11 @@ Future<Nothing> DockerContainerizerProcess::_update(
   }
 
   containers_[containerId]->pid = container.pid.get();
+  containers_[containerId]->ip_address = container.ip_address;
+  containers_[containerId]->gateway = container.gateway;
+  containers_[containerId]->bridge = container.bridge;
+  containers_[containerId]->ip_prefix_len = container.ip_prefix_len;
+  containers_[containerId]->mac_address = container.mac_address;
 
   return __update(containerId, _resources, container.pid.get());
 }
